@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// MULTI-TENANT CORE
+// ==========================================
+
+model Tenant {
+  id              String    @id @default(uuid())
+  name            String
+  domain          String?   @unique
+  color           String?   @default("#3b82f6") // Para personalización de UI
+  logoUrl         String?   // URL del logo
+  stripeAccountId String?   // ID de la cuenta conectada de Stripe (Marketplace)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  users           User[]
+  products        Product[]
+  orders          Order[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hash
+  name      String
+  role      String   @default("CASHIER") // SUPERADMIN, ADMIN, CASHIER
+  
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// INVENTORY & E-COMMERCE
+// ==========================================
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  sku         String
+  barcode     String?  @unique // EAN-13 o Code 128
+  price       Float
+  cost        Float
+  stock       Int      @default(0)
+  imageUrl    String?  // URL del NAS (NFS)
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+
+  @@unique([tenantId, sku]) // SKU único por inquilino
+}
+
+// ==========================================
+// POS & ORDERS
+// ==========================================
+
+model Order {
+  id            String        @id @default(uuid())
+  source        String        // POS, ECOMMERCE
+  total         Float
+  paymentMethod String        // CASH, CARD, STRIPE, CASH_ON_DELIVERY
+  isPaid        Boolean       @default(false)
+  
+  tenantId      String
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  items         OrderItem[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  price     Float    // Precio al momento de la venta
+  
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+}
