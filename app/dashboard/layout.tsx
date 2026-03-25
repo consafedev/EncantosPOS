@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import Link from "next/link";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -41,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <h1 className="text-xl font-semibold text-gray-800 dark:text-white">Panel de Control</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600 dark:text-gray-400">{session.user?.email} ({session.user?.role})</span>
-            <a href="/api/auth/signout" className="text-sm text-red-600 hover:text-red-800">Cerrar Sesión</a>
+            <Link href="/api/auth/signout" className="text-sm text-red-600 hover:text-red-800">Cerrar Sesión</Link>
           </div>
         </header>
         <div className="p-6">

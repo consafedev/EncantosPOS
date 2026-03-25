@@ -18,6 +18,13 @@ model Tenant {
   color           String?   @default("#3b82f6") // Para personalización de UI
   logoUrl         String?   // URL del logo
   stripeAccountId String?   // ID de la cuenta conectada de Stripe (Marketplace)
+  
+  // Platform Subscription
+  subscriptionStatus String?   @default("TRIAL") // TRIAL, ACTIVE, PAST_DUE, CANCELED
+  plan               String?   @default("FREE")  // FREE, BASIC, PRO, ENTERPRISE
+  stripeSubscriptionId String? 
+  stripeCustomerId     String? 
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

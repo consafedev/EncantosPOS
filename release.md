@@ -27,6 +27,28 @@
 
 ---
 
+## 🛠️ Requerimientos de Despliegue y Servidor
+
+1. **NAS Local Integration:**
+   - **IP:** `10.18.170.236`
+   - **Ruta:** `/saas_uploads`
+   - **Nota:** Los archivos de productos y logos se almacenarán en este volumen montado vía NFS. Se debe configurar la variable de entorno `UPLOAD_DIR` para que apunte a la ruta de montaje local (ej. `/mnt/saas_uploads`).
+
+2. **Stripe Webhooks:**
+   - **Estado:** Estructura base implementada en `/api/stripe/webhook`.
+   - **Acción:** Una vez el servidor esté vivo con una URL pública (ej. `https://mi-saas.com`), se debe configurar el endpoint `https://mi-saas.com/api/stripe/webhook` en el dashboard de Stripe.
+   - **Eventos:** Configurar para escuchar `checkout.session.completed`.
+   - **Variables:** Se requiere `STRIPE_WEBHOOK_SECRET` en el entorno.
+   - **Pendiente:** Implementar la lógica de descuento de inventario dentro del webhook una vez confirmado el pago.
+
+3. **Limitaciones de Pulido (Post-Montaje):**
+   - **HTTPS:** El flujo de Stripe Checkout y Connect requiere HTTPS para funcionar correctamente en producción.
+   - **PWA:** El registro del Service Worker requiere entorno seguro (HTTPS).
+   - **Marketplace Automation:** La automatización de FB Marketplace requiere el entorno real del servidor para manejar las colas de BullMQ y el navegador headless.
+   - **Blindaje:** Se ha revisado el código para asegurar que los compradores no necesiten cuenta y que el flujo de pago sea robusto.
+
+---
+
 ## 💡 Propuestas de Mejora y Amplitud (Aprobadas)
 
 Todas las propuestas han sido **ACEPTADAS** por el Delivery Manager y se integran al roadmap:
