@@ -21,7 +21,8 @@ export default function SettingsPage() {
     name: "",
     color: "#3b82f6",
     logoUrl: "",
-    stripeAccountId: ""
+    stripeAccountId: "",
+    apiKey: ""
   });
 
   useEffect(() => {
@@ -34,7 +35,8 @@ export default function SettingsPage() {
             name: data.name || "",
             color: data.color || "#3b82f6",
             logoUrl: data.logoUrl || "",
-            stripeAccountId: data.stripeAccountId || ""
+            stripeAccountId: data.stripeAccountId || "",
+            apiKey: data.apiKey || ""
           });
         }
       } catch (err) {
@@ -58,6 +60,23 @@ export default function SettingsPage() {
       }
     } catch (err) {
       setMessage("Error de red al conectar con Stripe");
+    }
+  };
+
+  const generateApiKey = async () => {
+    if (!confirm("¿Estás seguro de que quieres generar una nueva clave? La anterior dejará de funcionar.")) return;
+    
+    try {
+      const res = await fetch("/api/settings/apikey", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({ ...formData, apiKey: data.apiKey });
+        setMessage("Nueva API Key generada exitosamente.");
+      } else {
+        setMessage("Error al generar API Key");
+      }
+    } catch (err) {
+      setMessage("Error de red al generar API Key");
     }
   };
 
@@ -150,6 +169,32 @@ export default function SettingsPage() {
                 <img src={formData.logoUrl} alt="Logo Preview" className="max-h-20 object-contain" />
               </div>
             )}
+          </div>
+
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Integraciones Externas (n8n)</h3>
+            <div className="p-4 border rounded bg-gray-50 dark:bg-gray-900 space-y-4">
+              <div>
+                <p className="font-medium text-gray-800 dark:text-white">API Key</p>
+                <p className="text-sm text-gray-500">Usa esta clave para conectar con n8n y automatizar publicaciones en Marketplace.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={formData.apiKey || "No generada"} 
+                  className="flex-1 p-2 bg-white dark:bg-gray-800 border rounded font-mono text-sm"
+                />
+                <button 
+                  type="button"
+                  onClick={generateApiKey}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm font-bold"
+                  style={{ backgroundColor: formData.color }}
+                >
+                  {formData.apiKey ? "Regenerar" : "Generar Clave"}
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="pt-6 border-t border-gray-200 dark:border-gray-700">

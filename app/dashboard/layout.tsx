@@ -2,20 +2,31 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
+import DynamicFavicon from "@/components/dynamic-favicon";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user.tenantId) {
     redirect("/login");
   }
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: session.user.tenantId }
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+      <DynamicFavicon logoUrl={tenant?.logoUrl || undefined} />
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">SaaS Platform</h2>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+          {tenant?.logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={tenant.logoUrl} alt={tenant.name} className="h-8 w-8 object-contain" />
+          )}
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white truncate">{tenant?.name || "SaaS Platform"}</h2>
         </div>
         <nav className="p-4 space-y-2">
           <a href="/dashboard" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
@@ -26,6 +37,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </a>
           <a href="/dashboard/pos" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
             Punto de Venta
+          </a>
+          <a href="/dashboard/marketplace" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+            Marketplace
           </a>
           <a href="/dashboard/settings" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
             Configuración

@@ -18,6 +18,7 @@ model Tenant {
   color           String?   @default("#3b82f6") // Para personalización de UI
   logoUrl         String?   // URL del logo
   stripeAccountId String?   // ID de la cuenta conectada de Stripe (Marketplace)
+  apiKey          String?   @unique // Para integraciones externas (n8n)
   
   // Platform Subscription
   subscriptionStatus String?   @default("TRIAL") // TRIAL, ACTIVE, PAST_DUE, CANCELED
@@ -69,8 +70,28 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   orderItems  OrderItem[]
+  marketplaceJobs MarketplaceJob[]
 
   @@unique([tenantId, sku]) // SKU único por inquilino
+}
+
+// ==========================================
+// MARKETPLACE AUTOMATION
+// ==========================================
+
+model MarketplaceJob {
+  id          String   @id @default(uuid())
+  status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  error       String?
+  jobId       String?  // ID de BullMQ
+  
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  tenantId    String
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // ==========================================

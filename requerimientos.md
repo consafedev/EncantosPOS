@@ -28,5 +28,10 @@ Para evitar que Facebook bloquee tu cuenta personal o la de la empresa durante l
 
 -genera un apartado para que el administrador pueda seleccioonar el logo y se ponga tambien en el favicon, y el color permitele elegir libremente entre colores que sean previamente estudiados e implementados para seguir preservando potencia y atraccion de UX y UI.
 
+## 4. Requerimientos de PWA y Offline - *Implementado en Sprint 4*
+* **HTTPS:** Para que la PWA y el Service Worker funcionen en producción, el sitio **DEBE** servirse a través de HTTPS.
+* **Navegador:** Se recomienda el uso de Chrome o Edge para la mejor experiencia con IndexedDB y PWA en tablets.
+* **Sincronización:** El usuario debe recordar presionar el botón "Sincronizar Ventas" cuando recupere la conexión a internet para subir las ventas locales al servidor.
+
 ---
 *Nota del Arquitecto:* En este entorno de desarrollo (AI Studio), simularemos la subida de archivos (NFS) guardándolos en la carpeta local `/public/uploads`. Cuando despleguemos en tu servidor Debian, simplemente apuntaremos esa ruta al punto de montaje del NAS. ¡Todo está bajo control!

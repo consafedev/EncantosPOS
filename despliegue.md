@@ -17,9 +17,10 @@ Asegúrate de tener instalado lo siguiente en tu servidor Debian:
 El sistema guardará las imágenes directamente en el NAS. Debemos montar la carpeta del NAS en el servidor Debian.
 
 ```bash
-sudo mkdir -p /mnt/nas/saas_uploads
-# Reemplaza la IP y la ruta por las de tu NAS QNAP
-sudo mount -t nfs 192.168.1.X:/ruta/del/nas /mnt/nas/saas_uploads
+sudo mkdir -p /mnt/saas_uploads
+# IP del NAS: 10.18.170.236
+# Ruta del NAS: /saas_uploads
+sudo mount -t nfs 10.18.170.236:/saas_uploads /mnt/saas_uploads
 ```
 *Nota:* Para que el montaje sea persistente tras reinicios, debes agregarlo a `/etc/fstab`.
 
@@ -44,7 +45,7 @@ Añade/Modifica las siguientes variables:
 PORT=3005
 DATABASE_URL="postgresql://usuario:password@localhost:5432/saas_db?schema=public"
 NEXT_PUBLIC_APP_URL="https://tudominio.com"
-UPLOAD_DIR="/mnt/nas/saas_uploads"
+UPLOAD_DIR="/mnt/saas_uploads"
 REDIS_URL="redis://localhost:6379"
 # ... otras variables (Stripe, etc.)
 ```
@@ -62,11 +63,21 @@ Usaremos PM2 para mantener la aplicación viva y reiniciarla si el servidor se r
 
 ```bash
 pm2 start npm --name "saas-platform" -- start -- -p 3005
+# Iniciar el worker de Marketplace (requiere Redis y Chrome instalado)
+pm2 start tsx --name "marketplace-worker" -- scripts/marketplace-worker.ts
 pm2 save
 pm2 startup
 ```
 
-## 7. Configuración del Proxy Inverso (Nginx)
+## 7. Requisitos para Automatización (Playwright)
+El worker de Marketplace requiere que el servidor tenga instalado un navegador. En Debian:
+```bash
+sudo npx playwright install-deps chromium
+npx playwright install chromium
+```
+Asegúrate de configurar `FB_EMAIL` y `FB_PASSWORD` en el `.env`.
+
+## 8. Configuración del Proxy Inverso (Nginx)
 Para exponer la aplicación al exterior (o a Cloudflared) sin exponer el puerto 3005 directamente, configuramos Nginx.
 
 ```bash
@@ -97,7 +108,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## 8. Actualizaciones Continuas (CI/CD Manual)
+## 9. Actualizaciones Continuas (CI/CD Manual)
 Cuando hagamos cambios en el código y quieras actualizar el servidor:
 ```bash
 cd /var/www/saas-platform

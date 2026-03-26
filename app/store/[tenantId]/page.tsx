@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useState, useEffect } from "react";
+import DynamicFavicon from "@/components/dynamic-favicon";
 
 export default function StorePage({ params }: { params: Promise<{ tenantId: string }> }) {
   const { items, addItem } = useCart();
@@ -37,6 +38,7 @@ export default function StorePage({ params }: { params: Promise<{ tenantId: stri
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ '--theme-color': tenant.color || '#3b82f6' } as React.CSSProperties}>
+      <DynamicFavicon logoUrl={tenant.logoUrl} />
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

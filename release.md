@@ -20,9 +20,21 @@
 - [x] Carrito de compras (Context API + LocalStorage).
 - [x] Checkout con Stripe y Webhooks base.
 
-### ⏳ Pendiente (Sprints 4 al 6)
-- **Sprint 4:** POS Offline-First (IndexedDB), event listener global para escáner, arqueo de caja.
-- **Sprint 5:** API para n8n, scripts de Playwright/Puppeteer-stealth para FB Marketplace.
+### ✅ Completado / En Progreso (Sprint 4)
+- [x] POS Offline-First con IndexedDB (Dexie).
+- [x] Listener global para escáner de códigos de barras.
+- [x] Gestión de caja (Arqueo de caja: entradas/salidas/apertura).
+- [x] PWA (Manifest, Service Worker, Registro).
+- [x] API de sincronización de ventas offline.
+
+### ✅ Completado / En Progreso (Sprint 5)
+- [x] API Key para integraciones externas (n8n).
+- [x] API Externa para productos y encolado de publicaciones.
+- [x] Sistema de colas con BullMQ y Redis (Estructura).
+- [x] Script de automatización con Playwright (Template).
+- [x] Dashboard de monitoreo de publicaciones Marketplace.
+
+### ⏳ Pendiente (Sprint 6)
 - **Sprint 6:** QA, pruebas offline/online, despliegue final.
 
 ---
